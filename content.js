@@ -1,5 +1,5 @@
 // Shift+Enter -> newline in the Google Sheets cell editor.
-// ALL selectors/strategies are UNVERIFIED against the live DOM (see README).
+// See CONTRIBUTING.md for how to debug if Google changes the Sheets DOM.
 
 // ---- Things Google may change -------------------------------------------
 const CONFIG = {
@@ -10,9 +10,6 @@ const CONFIG = {
     "div.cell-input.editable[contenteditable='true']",
     "#t-formula-bar-input [contenteditable='true']", // formula bar (unverified guess)
   ],
-  // Insertion strategies, tried in order until one reports success.
-  // Reorder after running the harness in the README.
-  INSERT_ORDER: ["insertLineBreak", "insertText", "rangeBr"],
   DEBUG: false,
 };
 // --------------------------------------------------------------------------
@@ -49,38 +46,6 @@ function describe(ed) {
   });
 }
 
-const STRATEGIES = {
-  insertLineBreak: () => document.execCommand("insertLineBreak"),
-  insertText: () => document.execCommand("insertText", false, "\n"),
-  rangeBr: () => {
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return false;
-    const range = sel.getRangeAt(0);
-    range.deleteContents();
-    const br = document.createElement("br");
-    range.insertNode(br);
-    range.setStartAfter(br);
-    range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);
-    return true;
-  },
-};
-
-function insertNewline() {
-  for (const name of CONFIG.INSERT_ORDER) {
-    try {
-      if (STRATEGIES[name]()) {
-        log("inserted via", name);
-        return true;
-      }
-    } catch (e) {
-      log(name, "threw", e);
-    }
-  }
-  return false;
-}
-
 window.addEventListener(
   "keydown",
   (e) => {
@@ -91,7 +56,7 @@ window.addEventListener(
     if (!editor) return; // not editing: let Sheets move selection up
     e.preventDefault();
     e.stopImmediatePropagation();
-    insertNewline();
+    log("insertLineBreak ->", document.execCommand("insertLineBreak"));
   },
   true
 );
