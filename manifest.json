@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Sheets Shift+Enter Newline",
+  "version": "0.1.0",
+  "description": "Shift+Enter inserts a newline inside a Google Sheets cell editor.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://docs.google.com/spreadsheets/*"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+}
